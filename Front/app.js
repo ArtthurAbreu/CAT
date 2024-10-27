@@ -151,3 +151,44 @@ window.onload = function() {
     carregarServidores();
     carregarAvaliacoes(); 
 };
+// Função para login
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    try {
+        const response = await fetch('http://localhost:3000/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            
+            // Salvar dados do usuário no localStorage ou cookies
+            localStorage.setItem('user', JSON.stringify(data.user));
+            
+            // Redirecionar para a página principal
+            window.location.href = 'index.html';
+        } else {
+            const error = await response.json();
+            document.getElementById('error-message').textContent = error.error;
+        }
+    } catch (err) {
+        console.error('Erro ao efetuar login:', err);
+        document.getElementById('error-message').textContent = 'Erro ao efetuar login';
+    }
+});
+
+// Verificar se o usuário está autenticado
+function checkAuthentication() {
+    const user = localStorage.getItem('user');
+    if (!user) {
+        // Se não houver usuário, redireciona para a página de login
+        window.location.href = 'login.html';
+    }
+}
+
